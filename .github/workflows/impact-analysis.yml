@@ -18,13 +18,13 @@ jobs:
 
       - name: Checkout microservice repos
         run: |
-          git clone https://github.com/simpsonoffl/ui-account-load
-          git clone https://github.com/simpsonoffl/apigee-mock-gateway
-          git clone https://github.com/simpsonoffl/psg-mock-router
-          git clone https://github.com/simpsonoffl/domain-ms-account-load
-          git clone https://github.com/simpsonoffl/crud-ms-account-load-db
-          git clone https://github.com/simpsonoffl/crud-ms-account-load-fdr
-          git clone https://github.com/simpsonoffl/fdr-vendor-mock
+          git clone https://github.com/simpsonorg/ui-account-load
+          git clone https://github.com/simpsonorg/apigee-mock-gateway
+          git clone https://github.com/simpsonorg/psg-mock-router
+          git clone https://github.com/simpsonorg/domain-ms-account-load
+          git clone https://github.com/simpsonorg/crud-ms-account-load-db
+          git clone https://github.com/simpsonorg/crud-ms-account-load-fdr
+          git clone https://github.com/simpsonorg/fdr-vendor-mock
 
       - name: Set up Python
         uses: actions/setup-python@v5
