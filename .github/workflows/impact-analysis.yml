@@ -64,10 +64,15 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            const owner = context.payload.pull_request.base.repo.owner.login;
+            const repo  = context.payload.pull_request.base.repo.name;
+            const pr    = context.payload.pull_request.number;
+
             const body = `${{ steps.impact.outputs.REPORT }}`;
+
             await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.name,
-              issue_number: context.issue.number,
+              owner,
+              repo,
+              issue_number: pr,
               body
             });
