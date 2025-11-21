@@ -1,22 +1,20 @@
 import json
 import os
 import re
+from openai import OpenAI
+from analyzer.pgvector_rag import search_similar_chunks
 
 # OpenAI Client
 try:
-    from openai import OpenAI
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-except Exception:
+except:
     client = None
 
 
-def _shorten_path(path):
-    return path.replace("\\", "/").split("/")[-1]
-
-
-def build_llm_prompt(pr_title, changed_files, graph):
+def build_llm_prompt(pr_title, changed_files, semantic_graph):
     """
-    Generates a beautiful Markdown-based Impact Review.
+    SAME dashboard formatting as before.
+    Uses semantic_graph instead of static dependency graph.
     """
 
     return f"""
@@ -46,11 +44,9 @@ Generate a detailed report with the following structure:
 For EACH impacted service in the dependency graph:
 ## <service-name>
 **Why impacted:** 1–2 sentences  
-**Files to review:** List **actual files from the graph** (max 8)  
+**Files to review:** List **actual files**  
 **Recommended fixes:** Bullet points  
 **Risk:** LOW / MEDIUM / HIGH  
-
-Keep sections well-structured with headings & bold labels.
 
 ================================================================================
 # 🧪 Recommended Test Coverage
@@ -69,21 +65,22 @@ PR Title:
 Changed Files:
 {json.dumps(changed_files, indent=2)}
 
-Dependency Graph:
-{json.dumps(graph, indent=2)}
+Semantic Dependency Graph (pgvector-based):
+{json.dumps(semantic_graph, indent=2)}
+
+Relevant RAG Chunks (Top semantic matches):
+{json.dumps(semantic_graph.get("rag_chunks", []), indent=2)}
 
 ------------------------------------------------------------------------------
-
-### OUTPUT FORMAT
 MUST be pure Markdown — no JSON, no backticks around the entire output.
 """
 
 
-def analyze(pr_title, changed_files, graph):
+def analyze(pr_title, changed_files, semantic_graph):
     if not client:
         return "⚠️ Missing OPENAI_API_KEY for analysis."
 
-    prompt = build_llm_prompt(pr_title, changed_files, graph)
+    prompt = build_llm_prompt(pr_title, changed_files, semantic_graph)
 
     try:
         response = client.chat.completions.create(
